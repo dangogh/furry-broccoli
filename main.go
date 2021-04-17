@@ -30,6 +30,8 @@ func main() {
 	}
 
 	route := chooseRoute(routes)
+
+	//predictions := getPredictions(route)
 	fmt.Println("you chose ", route)
 
 }
