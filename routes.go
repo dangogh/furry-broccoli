@@ -47,6 +47,7 @@ func (c *client) getRoutes() ([]Route, error) {
 		routes = append(routes,
 			Route{
 				LongName: attribs.Attributes.LongName,
+				ID:       attribs.ID,
 			},
 		)
 	}

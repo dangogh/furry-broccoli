@@ -44,5 +44,5 @@ func chooseRoute(routes []Route) Route {
 
 	// we know it's an int in range -- no need to check error
 	i, _ := strconv.Atoi(result)
-	return Route{LongName: routes[i].LongName}
+	return routes[i]
 }
