@@ -5,23 +5,22 @@ import (
 	"net/url"
 )
 
-type Route struct {
-	ID             string
-	LongName       string   `json:"long_name"`
-	DirectionNames []string `json:"direction_names"`
+type Stop struct {
+	ID   string
+	Name string `json:"name"`
 }
 
-// getRoutes returns a list of routes with the specified types
+// getStops returns a list of stops on the specified route
 // TODO: pass in list of types to include and generate filter
-func getRoutes() ([]Route, error) {
+func getStops(r Route) ([]Stop, error) {
 	// TODO: add API key in more central place
 	params := url.Values{}
 
 	// Only get attrs we need and filter route by type light rail or heavy rail
-	params.Add("fields[route]", "long_name,direction_names")
-	params.Add("filter[type]", "0,1")
+	params.Add("fields[stop]", "name")
+	params.Add("filter[route]", r.ID)
 
-	req, err := newRequest(MTBA_API, "routes", params)
+	req, err := newRequest(MTBA_API, "stops", params)
 	if err != nil {
 		return nil, err
 	}
@@ -40,17 +39,17 @@ func getRoutes() ([]Route, error) {
 		return nil, err
 	}
 
-	routes := make([]Route, 0, len(res.Data))
+	stops := make([]Stop, 0, len(res.Data))
 
 	for _, data := range res.Data {
-		r := Route{ID: data.ID}
-		err := json.Unmarshal(data.Attributes, &r)
+		s := Stop{ID: data.ID}
+		err := json.Unmarshal(data.Attributes, &s)
 		if err != nil {
 			return nil, err
 		}
 
-		routes = append(routes, r)
+		stops = append(stops, s)
 	}
 
-	return routes, nil
+	return stops, nil
 }

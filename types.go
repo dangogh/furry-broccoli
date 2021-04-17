@@ -1,12 +1,10 @@
 package main
 
-type Attribute struct {
-	LongName string `json:"long_name"`
-}
+import "encoding/json"
 
 type AttrMap struct {
-	ID         string    `json:"id"`
-	Attributes Attribute `json:"attributes"`
+	ID         string          `json:"id"`
+	Attributes json.RawMessage `json:"attributes,omitempty"`
 }
 
 type Result struct {
