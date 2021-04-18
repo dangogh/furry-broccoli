@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/url"
 )
 
@@ -49,6 +50,27 @@ func getStops(r Route) ([]Stop, error) {
 		}
 
 		stops = append(stops, s)
+	}
+
+	return stops, nil
+}
+
+func decodeStops(rdr io.Reader) ([]Stop, error) {
+	res, err := decodeResult(rdr)
+	if err != nil {
+		return nil, err
+	}
+
+	stops := make([]Stop, 0, len(res.Data))
+
+	for _, data := range res.Data {
+		r := Stop{ID: data.ID}
+		err := json.Unmarshal(data.Attributes, &r)
+		if err != nil {
+			return stops, err
+		}
+
+		stops = append(stops, r)
 	}
 
 	return stops, nil

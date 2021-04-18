@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"time"
 )
@@ -30,11 +31,13 @@ func getPredictions(r Route, s Stop, directionID int) ([]Prediction, error) {
 		return nil, err
 	}
 
-	dec := json.NewDecoder(resp.Body)
+	defer resp.Body.Close()
 
-	var res Result
+	return decodePredictions(resp.Body)
+}
 
-	err = dec.Decode(&res)
+func decodePredictions(rdr io.Reader) ([]Prediction, error) {
+	res, err := decodeResult(rdr)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +48,7 @@ func getPredictions(r Route, s Stop, directionID int) ([]Prediction, error) {
 		p := Prediction{ID: data.ID}
 		err := json.Unmarshal(data.Attributes, &p)
 		if err != nil {
-			return nil, err
+			return predictions, err
 		}
 
 		predictions = append(predictions, p)

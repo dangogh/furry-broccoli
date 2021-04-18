@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/url"
 )
 
@@ -31,11 +32,13 @@ func getRoutes() ([]Route, error) {
 		return nil, err
 	}
 
-	dec := json.NewDecoder(resp.Body)
+	defer resp.Body.Close()
 
-	var res Result
+	return decodeRoutes(resp.Body)
+}
 
-	err = dec.Decode(&res)
+func decodeRoutes(rdr io.Reader) ([]Route, error) {
+	res, err := decodeResult(rdr)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +49,7 @@ func getRoutes() ([]Route, error) {
 		r := Route{ID: data.ID}
 		err := json.Unmarshal(data.Attributes, &r)
 		if err != nil {
-			return nil, err
+			return routes, err
 		}
 
 		routes = append(routes, r)
