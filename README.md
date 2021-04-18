@@ -17,6 +17,7 @@ To run, ensure that a relatively new version of Go is installed (I use
 
 ```
 $ eval $(gimme 1.16.3)
+$ go test ./...
 $ go build
 $ MBTA_API_KEY=myapikey ./furry-brocolli
 ```
