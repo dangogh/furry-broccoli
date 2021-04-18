@@ -15,10 +15,8 @@ type Route struct {
 // getRoutes returns a list of routes with the specified types
 // TODO: pass in list of types to include and generate filter
 func getRoutes() ([]Route, error) {
-	// TODO: add API key in more central place
-	params := url.Values{}
-
 	// Only get attrs we need and filter route by type light rail or heavy rail
+	params := url.Values{}
 	params.Add("fields[route]", "long_name,direction_names")
 	params.Add("filter[type]", "0,1")
 

@@ -14,10 +14,8 @@ type Stop struct {
 // getStops returns a list of stops on the specified route
 // TODO: pass in list of types to include and generate filter
 func getStops(r Route) ([]Stop, error) {
-	// TODO: add API key in more central place
-	params := url.Values{}
-
 	// Only get attrs we need and filter route by type light rail or heavy rail
+	params := url.Values{}
 	params.Add("fields[stop]", "name")
 	params.Add("filter[route]", r.ID)
 
