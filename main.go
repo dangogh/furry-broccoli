@@ -3,25 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
-	"net/url"
 	"time"
 )
-
-const MTBA_API = "https://api-v3.mbta.com"
-
-func newRequest(base, path string, params url.Values) (*http.Request, error) {
-	uri, err := url.Parse(base)
-	if err != nil {
-		return nil, err
-	}
-
-	uri.Path += path
-	uri.RawQuery = params.Encode()
-
-	fmt.Println(uri.String())
-	return http.NewRequest("GET", uri.String(), nil)
-}
 
 func main() {
 	routes, err := getRoutes()
@@ -54,11 +37,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// max diff
 	now := time.Now()
+	t := time.Time{}
+
 	for _, p := range predictions {
-		fmt.Printf("%v, %d\n", p, p.DepartureTime.Sub(now))
+		if t.IsZero() || p.DepartureTime.Sub(now) < t.Sub(now) {
+			t = p.DepartureTime
+		}
 	}
 
-	fmt.Println("you chose ", route, route.DirectionNames[dir], stop)
-
+	fmt.Printf("The next train %s from %s will depart at %s -- %d minutes from now.\n",
+		route.DirectionNames[dir], stop.Name, t, t.Sub(now)/time.Minute)
 }

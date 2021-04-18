@@ -41,5 +41,15 @@ func getPredictions(r Route, s Stop, directionID int) ([]Prediction, error) {
 
 	predictions := make([]Prediction, 0, len(res.Data))
 
+	for _, data := range res.Data {
+		p := Prediction{ID: data.ID}
+		err := json.Unmarshal(data.Attributes, &p)
+		if err != nil {
+			return nil, err
+		}
+
+		predictions = append(predictions, p)
+	}
+
 	return predictions, nil
 }

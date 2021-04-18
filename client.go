@@ -1,29 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 )
 
-type client struct {
-	http.Client
-	APIKey string
+const MTBA_API = "https://api-v3.mbta.com"
+
+func newClient() *http.Client {
+	// TLS certs should be added here
+	return &http.Client{}
 }
 
-func newClient() *client {
-	// TODO: get API key from config -- not environment
-	return &client{
-		APIKey: os.Getenv("MBTA_API_KEY"),
-	}
-}
-
-func (c *client) Do(req *http.Request) (*http.Response, error) {
-	if c.APIKey != "" {
-		// Add api key to request if provided
-		param := req.URL.Query()
-		param.Add("api-key", c.APIKey)
-		req.URL.RawQuery = param.Encode()
+func newRequest(base, path string, params url.Values) (*http.Request, error) {
+	uri, err := url.Parse(base)
+	if err != nil {
+		return nil, err
 	}
 
-	return c.Client.Do(req)
+	uri.Path += path
+	params.Add("api_key", os.Getenv("MBTA_API_KEY"))
+	uri.RawQuery = params.Encode()
+
+	fmt.Println(uri.String())
+	return http.NewRequest("GET", uri.String(), nil)
 }
