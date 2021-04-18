@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -20,10 +19,14 @@ func newRequest(base, path string, params url.Values) (*http.Request, error) {
 		return nil, err
 	}
 
+	// if an api key is provided, use it
+	// TODO: use something better than env var
+	if k := os.Getenv("MBTA_API_KEY"); k != "" {
+		params.Add("api_key", k)
+	}
+
 	uri.Path += path
-	params.Add("api_key", os.Getenv("MBTA_API_KEY"))
 	uri.RawQuery = params.Encode()
 
-	fmt.Println(uri.String())
 	return http.NewRequest("GET", uri.String(), nil)
 }

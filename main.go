@@ -47,6 +47,8 @@ func main() {
 		}
 	}
 
+	t = t.In(time.Local)
+
 	fmt.Printf("The next train %s from %s will depart at %s -- %d minutes from now.\n",
-		route.DirectionNames[dir], stop.Name, t, t.Sub(now)/time.Minute)
+		route.DirectionNames[dir], stop.Name, t.Format(time.Kitchen), t.Sub(now)/time.Minute)
 }
