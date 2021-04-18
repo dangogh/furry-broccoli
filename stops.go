@@ -31,28 +31,7 @@ func getStops(r Route) ([]Stop, error) {
 		return nil, err
 	}
 
-	dec := json.NewDecoder(resp.Body)
-
-	var res Result
-
-	err = dec.Decode(&res)
-	if err != nil {
-		return nil, err
-	}
-
-	stops := make([]Stop, 0, len(res.Data))
-
-	for _, data := range res.Data {
-		s := Stop{ID: data.ID}
-		err := json.Unmarshal(data.Attributes, &s)
-		if err != nil {
-			return nil, err
-		}
-
-		stops = append(stops, s)
-	}
-
-	return stops, nil
+	return decodeStops(resp.Body)
 }
 
 func decodeStops(rdr io.Reader) ([]Stop, error) {

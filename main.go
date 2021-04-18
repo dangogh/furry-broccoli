@@ -27,28 +27,38 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dir, err := chooseDirection(route.DirectionNames)
+	dirIdx, err := chooseDirection(route.DirectionNames)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dir := route.DirectionNames[dirIdx]
+
+	predictions, err := getPredictions(route, stop, dirIdx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	predictions, err := getPredictions(route, stop, dir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// max diff
-	now := time.Now()
+	// use the default zero-time as a sentinel that no predictions recorded, yet
 	t := time.Time{}
 
 	for _, p := range predictions {
-		if t.IsZero() || p.DepartureTime.Sub(now) < t.Sub(now) {
+		if p.DepartureTime.Before(t) || t.IsZero() {
 			t = p.DepartureTime
 		}
 	}
 
-	t = t.In(time.Local)
+	fmt.Println(reportNextDeparture(route, stop, dir, t))
+}
 
-	fmt.Printf("The next train %s from %s will depart at %s -- %d minutes from now.\n",
-		route.DirectionNames[dir], stop.Name, t.Format(time.Kitchen), t.Sub(now)/time.Minute)
+func reportNextDeparture(route Route, stop Stop, dir string, t time.Time) string {
+	if t.IsZero() {
+		return fmt.Sprintf("No predicted departures on route %s %s from %s.",
+			route.LongName, dir, stop.Name)
+	}
+
+	t = t.In(time.Local)
+	mins := time.Until(t) / time.Minute
+
+	return fmt.Sprintf("The next train on %s %s from %s will depart at %s -- %d minutes from now.\n",
+		route.LongName, dir, stop.Name, t.Format(time.Kitchen), mins)
 }
